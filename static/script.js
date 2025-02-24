@@ -1,8 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
+    let sourcesDropdown = document.getElementById("sources");
+    let countryDropdown = document.getElementById("country");
+    let categoryDropdown = document.getElementById("category");
+    let searchTypeRadios = document.getElementsByName("searchType");
+
+    // Fetch available sources and populate dropdown
     fetch('/get_sources')
         .then(response => response.json())
         .then(data => {
-            let sourcesDropdown = document.getElementById("sources");
             data.forEach(source => {
                 let option = document.createElement("option");
                 option.value = source.id;
@@ -11,12 +16,42 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-    document.getElementById("getNewsBtn").addEventListener("click", function () {
-        let country = document.getElementById("country").value;
-        let category = document.getElementById("category").value;
-        let sources = document.getElementById("sources").value;
+    // Enable/Disable fields based on search type
+    function updateSearchOptions() {
+        let selectedType = document.querySelector('input[name="searchType"]:checked').value;
 
-        let query = `/get_news?country=${country}&category=${category}&sources=${sources}`;
+        if (selectedType === "sources") {
+            sourcesDropdown.disabled = false;
+            countryDropdown.disabled = true;
+            categoryDropdown.disabled = true;
+        } else if (selectedType === "country") {
+            sourcesDropdown.disabled = true;
+            countryDropdown.disabled = false;
+            categoryDropdown.disabled = true;
+        } else if (selectedType === "category") {
+            sourcesDropdown.disabled = true;
+            countryDropdown.disabled = true;
+            categoryDropdown.disabled = false;
+        }
+    }
+
+    searchTypeRadios.forEach(radio => {
+        radio.addEventListener("change", updateSearchOptions);
+    });
+
+    document.getElementById("getNewsBtn").addEventListener("click", function () {
+        let selectedType = document.querySelector('input[name="searchType"]:checked').value;
+        let query = "/get_news?";
+
+        if (selectedType === "sources") {
+            let selectedSources = Array.from(sourcesDropdown.selectedOptions).map(option => option.value).join(",");
+            query += `sources=${selectedSources}`;
+        } else if (selectedType === "country") {
+            query += `country=${countryDropdown.value}`;
+        } else if (selectedType === "category") {
+            query += `category=${categoryDropdown.value}`;
+        }
+
         fetch(query)
             .then(response => response.json())
             .then(data => {
@@ -36,4 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
     });
+
+    // Initialize UI state
+    updateSearchOptions();
 });

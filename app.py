@@ -1,17 +1,26 @@
 from flask import Flask, request, jsonify, render_template
 from newsapi import NewsApiClient
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Get API key from environment variable
+API_KEY = os.getenv('NEWS_API_KEY')
+
+if not API_KEY:
+    raise ValueError("Missing API key! Set NEWS_API_KEY as an environment variable.")
 
 app = Flask(__name__)
-newsapi = NewsApiClient(api_key='YOUR_NEWSAPI_KEY')
+newsapi = NewsApiClient(api_key=API_KEY)
 
 @app.route('/')
 def index():
-    """Serve the frontend HTML page"""
     return render_template('index.html')
 
 @app.route('/get_sources', methods=['GET'])
 def get_sources():
-    """Returns a list of available news sources"""
     sources = newsapi.get_sources()
     return jsonify(sources['sources'])
 
@@ -22,16 +31,18 @@ def get_news():
     category = request.args.get('category')
     sources = request.args.get('sources')
 
-    # Ensure only valid parameter combinations are used
+    # Ensure only one search method is used
     if sources and (country or category):
-        return jsonify({"error": "Cannot mix sources with country/category"}), 400
+        return jsonify({"error": "Cannot mix sources with country/category."}), 400
 
-    # Fetch top headlines
-    top_headlines = newsapi.get_top_headlines(
-        country=country if country != "all" else None,
-        category=category if category != "all" else None,
-        sources=sources if sources != "all" else None
-    )
+    if sources:
+        top_headlines = newsapi.get_top_headlines(sources=sources)
+    elif country:
+        top_headlines = newsapi.get_top_headlines(country=country)
+    elif category:
+        top_headlines = newsapi.get_top_headlines(category=category)
+    else:
+        top_headlines = newsapi.get_top_headlines()
 
     return jsonify(top_headlines['articles'])
 

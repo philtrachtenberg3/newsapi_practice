@@ -4,13 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>News Explorer</title>
-    <link rel="stylesheet" href="../static/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <h1>News Explorer</h1>
-    
+
+    <!-- Search Type Selection -->
+    <label><input type="radio" name="searchType" value="sources" checked> Search by Sources</label>
+    <label><input type="radio" name="searchType" value="country"> Search by Country</label>
+    <label><input type="radio" name="searchType" value="category"> Search by Category</label>
+
+    <!-- Source Selection -->
+    <label for="sources">Sources:</label>
+    <select id="sources" multiple>
+        <option value="all">All Sources</option>
+    </select>
+
+    <!-- Country Selection -->
     <label for="country">Country:</label>
-    <select id="country">
+    <select id="country" disabled>
         <option value="all">All</option>
         <option value="us">United States</option>
         <option value="gb">United Kingdom</option>
@@ -18,8 +30,9 @@
         <option value="au">Australia</option>
     </select>
 
+    <!-- Category Selection -->
     <label for="category">Category:</label>
-    <select id="category">
+    <select id="category" disabled>
         <option value="all">All</option>
         <option value="business">Business</option>
         <option value="technology">Technology</option>
@@ -27,15 +40,10 @@
         <option value="health">Health</option>
     </select>
 
-    <label for="sources">Sources:</label>
-    <select id="sources">
-        <option value="all">All</option>
-    </select>
-
     <button id="getNewsBtn">Get News</button>
 
     <div id="newsResults"></div>
 
-    <script src="../static/script.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
