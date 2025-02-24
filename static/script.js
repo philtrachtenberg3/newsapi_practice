@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let categoryDropdown = document.getElementById("category");
     let searchTypeRadios = document.getElementsByName("searchType");
 
-    // Fetch available sources and populate dropdown
+    // Load sources dynamically
     fetch('/get_sources')
         .then(response => response.json())
         .then(data => {
@@ -13,6 +13,30 @@ document.addEventListener("DOMContentLoaded", function () {
                 option.value = source.id;
                 option.textContent = source.name;
                 sourcesDropdown.appendChild(option);
+            });
+        });
+
+    // Load available countries dynamically
+    fetch('/get_countries')
+        .then(response => response.json())
+        .then(countryCodes => {
+            let countryList = [];
+
+            countryCodes.forEach(code => {
+                if (countryMapping[code]) {
+                    countryList.push({ code: code, name: countryMapping[code] });
+                }
+            });
+
+            // Sort by full country name
+            countryList.sort((a, b) => a.name.localeCompare(b.name));
+
+            // Populate dropdown
+            countryList.forEach(country => {
+                let option = document.createElement("option");
+                option.value = country.code.toLowerCase();
+                option.textContent = country.name;
+                countryDropdown.appendChild(option);
             });
         });
 

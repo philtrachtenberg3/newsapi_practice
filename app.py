@@ -24,6 +24,19 @@ def get_sources():
     sources = newsapi.get_sources()
     return jsonify(sources['sources'])
 
+@app.route('/get_countries', methods=['GET'])
+def get_countries():
+    """Get a list of available countries from NewsAPI sources"""
+    sources = newsapi.get_sources()
+
+    country_codes = set()
+    for source in sources['sources']:
+        if source['country']:
+            country_codes.add(source['country'].upper())
+
+    return jsonify(sorted(list(country_codes)))  # Return sorted list of unique country codes
+
+
 @app.route('/get_news', methods=['GET'])
 def get_news():
     """Fetch top headlines based on user selections"""
@@ -38,11 +51,22 @@ def get_news():
     if sources:
         top_headlines = newsapi.get_top_headlines(sources=sources)
     elif country:
-        top_headlines = newsapi.get_top_headlines(country=country)
+        # Instead of directly using the country parameter,
+        # fetch sources for that country and then get headlines from those sources.
+        sources_result = newsapi.get_sources(country=country)
+        source_ids = [source['id'] for source in sources_result['sources']]
+        if source_ids:
+            top_headlines = newsapi.get_top_headlines(sources=",".join(source_ids))
+        else:
+            top_headlines = {"articles": []}
     elif category:
         top_headlines = newsapi.get_top_headlines(category=category)
     else:
         top_headlines = newsapi.get_top_headlines()
+
+    # Return an error message if no articles found.
+    if not top_headlines.get('articles'):
+        return jsonify({"error": "No news found for the selected criteria."})
 
     return jsonify(top_headlines['articles'])
 
