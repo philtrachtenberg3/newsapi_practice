@@ -30,3 +30,17 @@ select, button {
     border-radius: 5px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
+
+.source {
+    color: #666;
+    font-style: italic;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+  }
+
+  .article {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }

@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     data.forEach(article => {
                         let articleDiv = document.createElement("div");
                         articleDiv.innerHTML = `<h3>${article.title}</h3>
+                                                <p class="source">Source: ${article.source.name || "Unknown Source"}</p>
                                                 <p>${article.description || "No description available"}</p>
                                                 <a href="${article.url}" target="_blank">Read more</a>`;
                         newsContainer.appendChild(articleDiv);
